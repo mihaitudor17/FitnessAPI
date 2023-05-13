@@ -1,21 +1,21 @@
 ﻿using FitnessAPI.Enums;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FitnessAPI.Entities
 {
-    public class Workout
+    public class Workout:BaseEntity
     {
-        public int WorkoutId { get; set; }
-        private WorkoutType exercise;
-        private IntensityType intensity;
-        private DateOnly date;
-        private int duration;
-        public Workout(WorkoutType exercise, IntensityType intensity, int duration)
-        {
-            this.exercise = exercise;
-            this.intensity = intensity;
-            this.date = DateOnly.FromDateTime(DateTime.Now);
-            this.duration = duration;
-        }
+        [Required]
+        public WorkoutType Exercise { get; set; }
+        [Required]
+        public IntensityType Intensity { get; set; }
+        [Required]
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        [Required]
+        public int Duration { get; set; }
+        [NotMapped]
         private Dictionary<IntensityType, double> IntensityDict = new Dictionary<IntensityType, double>
         {
             { IntensityType.Easy, 0.5 },
