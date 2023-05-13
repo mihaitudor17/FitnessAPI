@@ -1,6 +1,7 @@
 ﻿using FitnessAPI.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace FitnessAPI.Entities
 {
@@ -10,7 +11,8 @@ namespace FitnessAPI.Entities
         public string UserName { get; set; }
         [Required]
         public string Password {get; set; }
-        [ForeignKey(nameof(PersonId))]
+        [JsonIgnore]
+        [ForeignKey(nameof(Person))]
         public int PersonId { get; set; }
         [Required]
         private RoleType role;
