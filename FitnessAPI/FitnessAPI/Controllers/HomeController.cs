@@ -1,5 +1,6 @@
 using FitnessAPI.DTOs;
 using FitnessAPI.Entities;
+using FitnessAPI.Enums;
 using FitnessAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,13 +17,16 @@ namespace FitnessAPI.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly CustomDbContext _dbContext;
+        private readonly AuthorizationService _authorization;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-
-        public HomeController(UserManager<User> userManager, SignInManager<User> signInManager, CustomDbContext dbContext)
+        public HomeController(UserManager<User> userManager, SignInManager<User> signInManager, CustomDbContext dbContext, AuthorizationService authorization, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _dbContext = dbContext;
+            _authorization = authorization;
+            _roleManager = roleManager;
         }
 
         [HttpPost("Signup")]
@@ -58,7 +62,14 @@ namespace FitnessAPI.Controllers
 
             if (result.Succeeded)
             {
-                return Ok();
+                foreach(var role in Enum.GetValues(typeof(RoleType)))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(role.ToString()));
+                }
+                var test = _roleManager.Roles.ToList();
+                var user = await _userManager.FindByNameAsync(userDto.UserName);
+                await _userManager.AddToRoleAsync(user, user.Role.ToString());
+                return Ok(new { token = _authorization.GetToken(user, user.Role.ToString()) });
             }
             else
             {
@@ -129,6 +140,7 @@ namespace FitnessAPI.Controllers
             return CreatedAtAction(nameof(AddWorkout), new { id = newWorkout.Id }, newWorkout);
         }
 
+        //[Authorize(Roles = "User")]
         [HttpGet("Total calories")]
         public async Task<IActionResult> GetPersonAndWorkout()
         {
@@ -151,5 +163,37 @@ namespace FitnessAPI.Controllers
             // Return the person and their latest workout
             return Ok(new { Calories = calories });
         }
+
+        //[Authorize(Roles = "Admin")]
+        [HttpDelete("Delete user records")]
+        public async Task<IActionResult> DeletePersonAndWorkoutsForUser(string userName)
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Get the person for the user
+            var person = await _dbContext.People.FirstOrDefaultAsync(p => p.Id == user.PersonId );
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            // Delete all workouts for the person
+            var workouts = await _dbContext.Workouts.Where(w => w.PersonId == person.Id).ToListAsync();
+            _dbContext.Workouts.RemoveRange(workouts);
+
+            // Delete the person for the user
+            _dbContext.People.Remove(person);
+            _dbContext.Users.Remove(user);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
     }
 }

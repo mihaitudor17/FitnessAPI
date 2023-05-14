@@ -13,6 +13,7 @@ namespace FitnessAPI
         public DbSet<IdentityRole> Roles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("AspNetRoleClaims");
             modelBuilder.Entity<Person>()
                 .HasMany(p => p.Workouts)
                 .WithOne(w => w.Person)
