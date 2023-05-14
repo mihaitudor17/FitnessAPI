@@ -10,10 +10,13 @@ namespace FitnessAPI
         public DbSet<Workout> Workouts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<IdentityUserClaim<string>> UserClaims { get; set; }
+        public DbSet<IdentityRole> Roles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Person>()
                 .HasMany(p => p.Workouts);
+            modelBuilder.Entity<IdentityUserRole<string>>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
