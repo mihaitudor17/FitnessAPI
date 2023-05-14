@@ -28,7 +28,7 @@ namespace FitnessAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new User { UserName = userDto.UserName };
+            var user = new User { UserName = userDto.UserName, Role = userDto.Role };
             var result = await _userManager.CreateAsync(user, userDto.Password);
 
             if (result.Succeeded)
