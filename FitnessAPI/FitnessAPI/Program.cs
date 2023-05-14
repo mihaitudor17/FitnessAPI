@@ -1,5 +1,6 @@
 using FitnessAPI;
 using FitnessAPI.Entities;
+using FitnessAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
 
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
-
+builder.Services.AddScoped<AuthorizationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
