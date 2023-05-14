@@ -12,6 +12,5 @@ namespace FitnessAPI.DTOs
         public IntensityType Intensity { get; set; }
         [Required]
         public int Duration { get; set; }
-
     }
 }

@@ -15,13 +15,10 @@ namespace FitnessAPI.Services
         private int PBKDF2SubkeyLength = 256 / 8;
         private int SaltSize = 128 / 8;
         private int KeyLength = 256;
-
-
         public AuthorizationService(IConfiguration config)
         {
             _securityKey = GenerateRandomKey(KeyLength);
         }
-
         public string GetToken(User user, string role)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -30,7 +27,6 @@ namespace FitnessAPI.Services
             var roleClaim = new Claim("role", role);
             var idClaim = new Claim("userId", user.Id.ToString());
             var infoClaim = new Claim("username", user.UserName);
-
             var tokenDescriptior = new SecurityTokenDescriptor
             {
                 Issuer = "Backend",
@@ -39,10 +35,8 @@ namespace FitnessAPI.Services
                 Expires = DateTime.Now.AddYears(1),
                 SigningCredentials = credentials
             };
-
             var token = jwtTokenHandler.CreateToken(tokenDescriptior);
             var tokenString = jwtTokenHandler.WriteToken(token);
-
             return tokenString;
         }
 
@@ -50,7 +44,6 @@ namespace FitnessAPI.Services
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityKey));
-
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = false,
@@ -59,17 +52,14 @@ namespace FitnessAPI.Services
                 ValidateAudience = false,
                 ValidateIssuerSigningKey = true,
             };
-
             if (!jwtTokenHandler.CanReadToken(tokenString.Replace("Bearer ", string.Empty)))
             {
                 Console.WriteLine("Invalid Token");
                 return false;
             }
-
             jwtTokenHandler.ValidateToken(tokenString, tokenValidationParameters, out var validatedToken);
             return validatedToken != null;
         }
-
         public static string GenerateRandomKey(int keyLength)
         {
             var randomBytes = new byte[keyLength];

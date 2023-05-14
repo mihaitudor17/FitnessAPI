@@ -15,7 +15,6 @@ namespace FitnessAPI.Services
                 return 655.1 + (4.35 * person.Weight) + (4.7 * person.Height) - (4.7 * person.Age);
             }
         }
-
         private static double GetWorkoutCalories(Workout workout)
         {
             if (workout.Date == DateOnly.FromDateTime(DateTime.Today))
@@ -23,7 +22,6 @@ namespace FitnessAPI.Services
             else
                 return 0;
         }
-
         public static double GetTotalCalories(Person person)
         {
             return person.Workouts.Sum(w => GetWorkoutCalories(w)) + GetBMRCalories(person);
