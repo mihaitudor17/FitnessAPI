@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FitnessAPI.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace FitnessAPI.DTOs
 {
@@ -9,5 +10,7 @@ namespace FitnessAPI.DTOs
 
         [Required]
         public string Password { get; set; }
+        [Required]
+        public RoleType Role { get; set; }
     }
 }

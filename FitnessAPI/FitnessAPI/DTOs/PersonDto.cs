@@ -1,19 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FitnessAPI.Entities
+namespace FitnessAPI.DTOs
 {
-    public class Person : BaseEntity
+    public class PersonDto
     {
         [Required]
         public string Name { get; set; }
         [Required]
         public int Height { get; set; }
         [Required]
-        public int Weight {get; set; }
+        public int Weight { get; set; }
         [Required]
         public int Age { get; set; }
         [Required]
-        public bool Gender{get; set; }
-        public ICollection<Workout> Workouts { get; set; } = new List<Workout>();
+        public bool Gender { get; set; }
     }
 }
