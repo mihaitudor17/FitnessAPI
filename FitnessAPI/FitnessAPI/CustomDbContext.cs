@@ -14,7 +14,9 @@ namespace FitnessAPI
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Person>()
-                .HasMany(p => p.Workouts);
+                .HasMany(p => p.Workouts)
+                .WithOne(w => w.Person)
+                .HasForeignKey(w => w.PersonId);
             modelBuilder.Entity<IdentityUserRole<string>>()
                 .HasKey(ur => new { ur.UserId, ur.RoleId });
         }

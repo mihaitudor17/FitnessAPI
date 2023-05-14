@@ -129,7 +129,7 @@ namespace FitnessAPI.Migrations
                     b.Property<int>("Intensity")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PersonId")
+                    b.Property<int>("PersonId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -195,9 +195,13 @@ namespace FitnessAPI.Migrations
 
             modelBuilder.Entity("FitnessAPI.Entities.Workout", b =>
                 {
-                    b.HasOne("FitnessAPI.Entities.Person", null)
+                    b.HasOne("FitnessAPI.Entities.Person", "Person")
                         .WithMany("Workouts")
-                        .HasForeignKey("PersonId");
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("FitnessAPI.Entities.Person", b =>

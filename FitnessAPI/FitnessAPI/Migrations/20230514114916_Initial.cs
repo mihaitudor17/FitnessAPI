@@ -103,11 +103,11 @@ namespace FitnessAPI.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PersonId = table.Column<int>(type: "integer", nullable: false),
                     Exercise = table.Column<int>(type: "integer", nullable: false),
                     Intensity = table.Column<int>(type: "integer", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    Duration = table.Column<int>(type: "integer", nullable: false),
-                    PersonId = table.Column<int>(type: "integer", nullable: true)
+                    Duration = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,7 +116,8 @@ namespace FitnessAPI.Migrations
                         name: "FK_Workouts_People_PersonId",
                         column: x => x.PersonId,
                         principalTable: "People",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

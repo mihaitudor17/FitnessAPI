@@ -14,7 +14,6 @@ namespace FitnessAPI.Entities
         public int Age { get; set; }
         [Required]
         public bool Gender{get; set; }
-        public ICollection<Workout> Workouts { get; set; }
-
+        public ICollection<Workout> Workouts { get; set; } = new List<Workout>();
     }
 }

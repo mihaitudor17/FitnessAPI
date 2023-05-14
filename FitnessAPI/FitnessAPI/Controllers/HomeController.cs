@@ -86,14 +86,14 @@ namespace FitnessAPI.Controllers
                 Age = person.Age,
                 Height = person.Height,
                 Weight = person.Weight,
-                Gender= person.Gender
+                Gender = person.Gender,
             };
 
             // Add the new person entity to the People DbSet and save the changes
             _dbContext.People.Add(newPerson);
+            await _dbContext.SaveChangesAsync();
             currentUser.PersonId = newPerson.Id;
             await _userManager.UpdateAsync(currentUser);
-            await _dbContext.SaveChangesAsync();
 
             // Return a 201 Created response with the new person entity as the response body
             return CreatedAtAction(nameof(AddPerson), new { id = newPerson.Id }, newPerson);
@@ -101,7 +101,7 @@ namespace FitnessAPI.Controllers
 
         //[Authorize(Roles = "User")]
         [HttpPost("Add Workout")]
-        public async Task<ActionResult<Workout>> AddWorkout(Workout workout)
+        public async Task<ActionResult<Workout>> AddWorkout(WorkoutDto workout)
         {
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
             // Check if the current user already has a person entity associated with it
@@ -110,20 +110,19 @@ namespace FitnessAPI.Controllers
             {
                 return Conflict("Please add your info first.");
             }
-
+            var person = _dbContext.People.FirstOrDefault(p => p.Id == currentUser.PersonId);
             // Create a new person entity and set its UserId property to the current user's Id
             var newWorkout = new Workout
             {
-                Date = workout.Date,
+                Date = DateOnly.FromDateTime(DateTime.Today),
                 Duration= workout.Duration,
                 Intensity= workout.Intensity,
-                Exercise = workout.Exercise
+                Exercise = workout.Exercise,
+                PersonId = person.Id
             };
 
             // Add the new person entity to the People DbSet and save the changes
-            _dbContext.Workouts.Add(newWorkout);
-            _dbContext.People.Find(currentUser.PersonId).Workouts.Add(newWorkout);
-            await _userManager.UpdateAsync(currentUser);
+            person.Workouts.Add(newWorkout);
             await _dbContext.SaveChangesAsync();
 
             // Return a 201 Created response with the new person entity as the response body

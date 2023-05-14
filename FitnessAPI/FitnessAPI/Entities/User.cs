@@ -13,7 +13,6 @@ namespace FitnessAPI.Entities
         //[Required]
         //public string Password {get; set; }
         [JsonIgnore]
-        [ForeignKey(nameof(Person))]
         public int PersonId { get; set; }
         [Required]
         public RoleType Role { get; set; }

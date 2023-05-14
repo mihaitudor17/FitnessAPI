@@ -7,16 +7,19 @@ namespace FitnessAPI.Entities
 {
     public class Workout:BaseEntity
     {
+        public int PersonId { get; set; }
+        [ForeignKey(nameof(PersonId))]
+        public Person Person { get; set; }
         [Required]
         public WorkoutType Exercise { get; set; }
         [Required]
         public IntensityType Intensity { get; set; }
         [Required]
-        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateOnly Date { get; set; }
         [Required]
         public int Duration { get; set; }
         [NotMapped]
-        private Dictionary<IntensityType, double> IntensityDict = new Dictionary<IntensityType, double>
+        public Dictionary<IntensityType, double> IntensityDict = new Dictionary<IntensityType, double>
         {
             { IntensityType.Easy, 0.5 },
             { IntensityType.Normal, 1 },
