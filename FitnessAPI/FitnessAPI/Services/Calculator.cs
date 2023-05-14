@@ -18,7 +18,10 @@ namespace FitnessAPI.Services
 
         private static double GetWorkoutCalories(Workout workout)
         {
-            return (workout.Duration / 60) * ((int)workout.Exercise * workout.IntensityDict[workout.Intensity]); 
+            if (workout.Date == DateOnly.FromDateTime(DateTime.Today))
+                return (workout.Duration / 60) * ((int)workout.Exercise * workout.IntensityDict[workout.Intensity]);
+            else
+                return 0;
         }
 
         public static double GetTotalCalories(Person person)
