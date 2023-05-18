@@ -165,5 +165,165 @@ namespace FitnessAPI.Controllers
             await _dbContext.SaveChangesAsync();
             return NoContent();
         }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("Get person")]
+        public async Task<ActionResult<IEnumerable<Person>>> GetPeople()
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var people = await _dbContext.People.Where(p => p.Id == currentUser.PersonId).ToListAsync();
+            return Ok(people);
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpPut("Update person")]
+        public async Task<IActionResult> UpdatePerson(PersonDto personDto)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var person = await _dbContext.People.FirstOrDefaultAsync(p => p.Id == currentUser.PersonId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            person.Name = personDto.Name;
+            person.Age = personDto.Age;
+            person.Height = personDto.Height;
+            person.Weight = personDto.Weight;
+            person.Gender = personDto.Gender;
+
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpDelete("Delete person")]
+        public async Task<IActionResult> DeletePerson(int id)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var person = await _dbContext.People.FirstOrDefaultAsync(p => p.Id == currentUser.PersonId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            var workouts = await _dbContext.Workouts.Where(w => w.PersonId == person.Id).ToListAsync();
+            _dbContext.Workouts.RemoveRange(workouts);
+            _dbContext.People.Remove(person);
+            currentUser.PersonId = 0;
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("Get users")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            return Ok(users);
+        }
+
+        [Authorize(Roles = "Admin")] 
+        [HttpPut("Update user")]
+        public async Task<IActionResult> UpdateUser(UserDto userDto)
+        {
+            var user = await _userManager.FindByNameAsync(userDto.UserName);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.UserName = userDto.UserName;
+            if (!string.IsNullOrEmpty(userDto.Password))
+            {
+                var passwordValidator = HttpContext.RequestServices.GetRequiredService<IPasswordValidator<User>>();
+                var passwordHasher = HttpContext.RequestServices.GetRequiredService<IPasswordHasher<User>>();
+
+                var result = await passwordValidator.ValidateAsync(_userManager, user, userDto.Password);
+                if (result.Succeeded)
+                {
+                    user.PasswordHash = passwordHasher.HashPassword(user, userDto.Password);
+                }
+                else
+                {
+                    return BadRequest(result.Errors);
+                }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return BadRequest(updateResult.Errors);
+            }
+
+            return NoContent();
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("Get workouts")]
+        public async Task<ActionResult<IEnumerable<Workout>>> GetWorkouts()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var person = await _dbContext.People.FirstOrDefaultAsync(p => p.Id == user.PersonId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+            var workouts = await _dbContext.Workouts
+                .Where(w => w.PersonId == person.Id)
+                .ToListAsync();
+
+            return Ok(workouts);
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpDelete("Delete workout")]
+        public async Task<IActionResult> DeleteWorkout(int id)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var person = await _dbContext.People.FirstOrDefaultAsync(p => p.Id == currentUser.PersonId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+            var workout = await _dbContext.Workouts
+                .FirstOrDefaultAsync(w => w.Id == id && w.PersonId == person.Id);
+
+            if (workout == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Workouts.Remove(workout);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpPut("Update workout")]
+        public async Task<IActionResult> UpdateWorkout(int id, WorkoutDto workoutDto)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var person = await _dbContext.People.FirstOrDefaultAsync(p => p.Id == currentUser.PersonId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+            var workout = await _dbContext.Workouts
+                 .FirstOrDefaultAsync(w => w.Id == id && w.PersonId == person.Id);
+            if (workout == null)
+            {
+                return NotFound();
+            }
+            workout.Intensity = workoutDto.Intensity;
+            workout.Exercise = workoutDto.Exercise;
+            workout.Duration = workoutDto.Duration;
+            await _dbContext.SaveChangesAsync();
+            return NoContent();
+        }
+
     }
 }
