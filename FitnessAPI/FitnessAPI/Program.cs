@@ -18,7 +18,12 @@ builder.Services.AddDbContext<CustomDbContext>();
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<CustomDbContext>()
     .AddDefaultTokenProviders();
-
+builder.Services.AddIdentityCore<IdentityUser>(options =>
+{
+    // Configure identity options if needed
+})
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<CustomDbContext>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SignInManager<User>>();
 builder.Services.AddScoped<AuthorizationService>();

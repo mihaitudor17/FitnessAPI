@@ -10,7 +10,6 @@ namespace FitnessAPI.Services
     public class AuthorizationService
     {
         private readonly string _securityKey;
-
         private int PBKDF2IterCount = 1000;
         private int PBKDF2SubkeyLength = 256 / 8;
         private int SaltSize = 128 / 8;
@@ -32,7 +31,7 @@ namespace FitnessAPI.Services
                 Issuer = "Backend",
                 Audience = "Frontend",
                 Subject = new ClaimsIdentity(new[] { roleClaim, idClaim, infoClaim }),
-                Expires = DateTime.Now.AddYears(1),
+                Expires = DateTime.Now.AddMinutes(5),
                 SigningCredentials = credentials
             };
             var token = jwtTokenHandler.CreateToken(tokenDescriptior);

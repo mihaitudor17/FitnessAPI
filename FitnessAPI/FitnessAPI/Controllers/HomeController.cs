@@ -62,10 +62,10 @@ namespace FitnessAPI.Controllers
 
             if (result.Succeeded)
             {
-                foreach(var role in Enum.GetValues(typeof(RoleType)))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(role.ToString()));
-                }
+                //foreach(var role in Enum.GetValues(typeof(RoleType)))
+                //{
+                //    await _roleManager.CreateAsync(new IdentityRole(role.ToString()));
+                //}
                 var test = _roleManager.Roles.ToList();
                 var user = await _userManager.FindByNameAsync(userDto.UserName);
                 await _userManager.AddToRoleAsync(user, user.Role.ToString());
