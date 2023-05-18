@@ -62,14 +62,15 @@ namespace FitnessAPI.Controllers
 
             if (result.Succeeded)
             {
-                //foreach(var role in Enum.GetValues(typeof(RoleType)))
-                //{
-                //    await _roleManager.CreateAsync(new IdentityRole(role.ToString()));
-                //}
-                var test = _roleManager.Roles.ToList();
                 var user = await _userManager.FindByNameAsync(userDto.UserName);
                 await _userManager.AddToRoleAsync(user, user.Role.ToString());
-                return Ok(new { token = _authorization.GetToken(user, user.Role.ToString()) });
+                Response.Cookies.Append("jwtToken", _authorization.GetToken(user, user.Role.ToString()), new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                });
+                return Ok(new { message = $"Logged in with the role {user.Role.ToString()}" });
             }
             else
             {
