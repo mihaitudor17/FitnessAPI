@@ -10,6 +10,15 @@ namespace FitnessAPI.DTOs
         [Required]
         public string Password { get; set; }
         [Required]
-        public RoleType Role { get; set; }
+        public string Role { get; set; }
+        public RoleType GetRoleType()
+        {
+            if (Enum.TryParse<RoleType>(Role, out var roleType))
+            {
+                return roleType;
+            }
+            // Default value if parsing fails
+            return RoleType.User;
+        }
     }
 }

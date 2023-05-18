@@ -37,7 +37,7 @@ namespace FitnessAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new User { UserName = userDto.UserName, Role = userDto.Role };
+            var user = new User { UserName = userDto.UserName, Role = userDto.GetRoleType() };
             var result = await _userManager.CreateAsync(user, userDto.Password);
 
             if (result.Succeeded)
@@ -119,8 +119,8 @@ namespace FitnessAPI.Controllers
             {
                 Date = DateOnly.FromDateTime(DateTime.Today),
                 Duration= workout.Duration,
-                Intensity= workout.Intensity,
-                Exercise = workout.Exercise,
+                Intensity= workout.GetIntensityType(),
+                Exercise = workout.GetExerciseType(),
                 PersonId = person.Id
             };
             person.Workouts.Add(newWorkout);
@@ -319,8 +319,8 @@ namespace FitnessAPI.Controllers
             {
                 return NotFound();
             }
-            workout.Intensity = workoutDto.Intensity;
-            workout.Exercise = workoutDto.Exercise;
+            workout.Intensity = workoutDto.GetIntensityType();
+            workout.Exercise = workoutDto.GetExerciseType();
             workout.Duration = workoutDto.Duration;
             await _dbContext.SaveChangesAsync();
             return NoContent();

@@ -7,10 +7,28 @@ namespace FitnessAPI.DTOs
     public class WorkoutDto
     {
         [Required]
-        public WorkoutType Exercise { get; set; }
+        public string Exercise { get; set; }
         [Required]
-        public IntensityType Intensity { get; set; }
+        public string Intensity { get; set; }
         [Required]
         public int Duration { get; set; }
+
+        public WorkoutType GetExerciseType()
+        {
+            if (Enum.TryParse<WorkoutType>(Exercise, out var exerciseType))
+            {
+                return exerciseType;
+            }
+            return WorkoutType.Jogging;
+        }
+
+        public IntensityType GetIntensityType()
+        {
+            if (Enum.TryParse<IntensityType>(Intensity, out var intensityType))
+            {
+                return intensityType;
+            }
+            return IntensityType.Normal;
+        }
     }
 }
