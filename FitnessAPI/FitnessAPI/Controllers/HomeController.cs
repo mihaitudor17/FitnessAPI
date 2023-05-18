@@ -28,7 +28,7 @@ namespace FitnessAPI.Controllers
             _authorization = authorization;
             _roleManager = roleManager;
         }
-
+        [AllowAnonymous]
         [HttpPost("Signup")]
         public async Task<IActionResult> CreateUser(UserDto userDto)
         {
@@ -54,15 +54,15 @@ namespace FitnessAPI.Controllers
                 return BadRequest(ModelState);
             }
         }
-
+        [AllowAnonymous]
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(UserDto userDto)
+        public async Task<IActionResult> Login(string UserName, string Password)
         {
-            var result = await _signInManager.PasswordSignInAsync(userDto.UserName, userDto.Password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(UserName, Password, false, false);
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByNameAsync(userDto.UserName);
+                var user = await _userManager.FindByNameAsync(UserName);
                 await _userManager.AddToRoleAsync(user, user.Role.ToString());
                 Response.Cookies.Append("jwtToken", _authorization.GetToken(user, user.Role.ToString()), new CookieOptions
                 {
